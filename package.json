@@ -1,95 +1,19 @@
 {
-  "name": "retort-vscode",
-  "displayName": "Retort",
-  "description": "AI agent orchestration for VS Code — command palette, sidebar, and status bar for the Retort framework",
-  "version": "0.1.0",
-  "publisher": "phoenixvc",
+  "name": "retort-plugins",
+  "private": true,
+  "description": "IDE plugins for the Retort framework — VSCode and PyCharm",
   "repository": {
     "type": "git",
-    "url": "https://github.com/phoenixvc/retort-vscode.git"
+    "url": "https://github.com/phoenixvc/retort-plugins.git"
   },
   "license": "MIT",
-  "engines": {
-    "vscode": "^1.85.0"
-  },
-  "categories": ["Other"],
-  "keywords": ["retort", "agentkit", "ai", "agent", "orchestration"],
-  "activationEvents": ["workspaceContains:.agentkit"],
-  "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      { "command": "retort.sync", "title": "Retort: Sync Configs" },
-      { "command": "retort.check", "title": "Retort: Run Check" },
-      { "command": "retort.healthcheck", "title": "Retort: Health Check" },
-      { "command": "retort.orchestrate", "title": "Retort: Orchestrate" },
-      { "command": "retort.plan", "title": "Retort: Plan" },
-      { "command": "retort.discover", "title": "Retort: Discover" },
-      { "command": "retort.validate", "title": "Retort: Validate" },
-      { "command": "retort.backlog", "title": "Retort: Show Backlog" },
-      { "command": "retort.handoff", "title": "Retort: Handoff" },
-      { "command": "retort.preflight", "title": "Retort: Preflight" },
-      { "command": "retort.security", "title": "Retort: Security Scan" },
-      { "command": "retort.projectStatus", "title": "Retort: Project Status" },
-      { "command": "retort.runCommand", "title": "Retort: Run Command..." },
-      { "command": "retort.refreshSidebar", "title": "Retort: Refresh Sidebar" }
-    ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "retort-sidebar",
-          "title": "Retort",
-          "icon": "resources/retort.svg"
-        }
-      ]
-    },
-    "views": {
-      "retort-sidebar": [
-        { "id": "retort.teams", "name": "Teams" },
-        { "id": "retort.backlog", "name": "Backlog" },
-        { "id": "retort.status", "name": "Orchestrator" }
-      ]
-    },
-    "menus": {
-      "view/title": [
-        {
-          "command": "retort.refreshSidebar",
-          "when": "view =~ /^retort\\./",
-          "group": "navigation"
-        }
-      ]
-    },
-    "configuration": {
-      "title": "Retort",
-      "properties": {
-        "retort.autoRefresh": {
-          "type": "boolean",
-          "default": true,
-          "description": "Automatically refresh sidebar when spec or backlog files change"
-        },
-        "retort.terminalName": {
-          "type": "string",
-          "default": "Retort",
-          "description": "Name of the integrated terminal used to run Retort commands"
-        }
-      }
-    }
-  },
+  "workspaces": [
+    "extensions/vscode",
+    "extensions/pycharm"
+  ],
   "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "lint": "eslint src --ext ts",
-    "typecheck": "tsc --noEmit",
-    "test": "node ./out/test/runTest.js",
-    "build": "npm run compile",
-    "package": "vsce package"
-  },
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/vscode": "^1.85.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
-    "@vscode/test-electron": "^2.3.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.3.0"
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
   }
 }

@@ -1,0 +1,15 @@
+<idea-plugin>
+  <id>com.phoenixvc.retort</id>
+  <name>Retort</name>
+  <version>0.1.0</version>
+  <vendor url="https://github.com/phoenixvc/retort-plugins">PhoenixVC</vendor>
+  <description>
+    AI agent orchestration for JetBrains IDEs — command palette, project panel,
+    and status bar for the Retort framework.
+  </description>
+  <idea-version since-build="233"/>
+
+  <!-- Stub — implementation pending -->
+  <extensions defaultExtensionNs="com.intellij">
+  </extensions>
+</idea-plugin>
