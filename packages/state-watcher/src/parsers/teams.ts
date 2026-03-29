@@ -18,12 +18,28 @@ import type { Team } from '../protocol.js'
  * The markdown fallback extracts team names from table rows in
  * AGENT_TEAMS.md and produces minimal Team objects with sensible defaults.
  */
+function detectRepoName(root: string): string {
+  try {
+    const markerPath = path.join(root, '.agentkit-repo')
+    if (fs.existsSync(markerPath)) {
+      return fs.readFileSync(markerPath, 'utf-8').trim()
+    }
+  } catch { /* ignore */ }
+  return path.basename(root)
+}
+
 export function parseTeams(root: string): Team[] {
-  // Try YAML spec first
-  const yamlPath = path.join(root, '.agentkit', 'spec', 'AGENT_TEAMS.yaml')
-  if (fs.existsSync(yamlPath)) {
-    const teams = parseTeamsYaml(yamlPath)
-    if (teams.length > 0) return teams
+  // Try canonical spec path first, then legacy name, then overlay
+  const candidates = [
+    path.join(root, '.agentkit', 'spec', 'teams.yaml'),            // canonical
+    path.join(root, '.agentkit', 'spec', 'AGENT_TEAMS.yaml'),      // legacy
+    path.join(root, '.agentkit', 'overlays', detectRepoName(root), 'teams.yaml'), // overlay
+  ]
+  for (const yamlPath of candidates) {
+    if (fs.existsSync(yamlPath)) {
+      const teams = parseTeamsYaml(yamlPath)
+      if (teams.length > 0) return teams
+    }
   }
 
   // Fallback: markdown table in AGENT_TEAMS.md

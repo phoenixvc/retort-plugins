@@ -5,6 +5,7 @@ import { AgentFleetPanel } from './panels/AgentFleetPanel'
 import { BacklogPanel } from './panels/BacklogPanel'
 import { TeamsPanel } from './panels/TeamsPanel'
 import { HandoffFeedPanel } from './panels/HandoffFeedPanel'
+import { CognitiveMeshPanel } from './panels/CognitiveMeshPanel'
 import { OnboardingPanel } from './panels/OnboardingPanel'
 
 interface Tab {
@@ -17,6 +18,7 @@ const TABS: Tab[] = [
   { id: 'backlog', label: 'Backlog' },
   { id: 'teams', label: 'Teams' },
   { id: 'handoff', label: 'Handoff' },
+  { id: 'cogmesh', label: 'Mesh' },
 ]
 
 function SyncIndicator() {
@@ -26,6 +28,17 @@ function SyncIndicator() {
     <span className={`sync-indicator sync-indicator--${state}`} title={message}>
       {state}
     </span>
+  )
+}
+
+function CogmeshDot() {
+  const health = useStore((s) => s.cogmeshHealth)
+  if (!health || health.status === 'unconfigured') return null
+  return (
+    <span
+      className={`cogmesh-dot cogmesh-dot--${health.status}`}
+      title={`Cognitive Mesh: ${health.status}${'latencyMs' in health ? ` (${health.latencyMs}ms)` : ''}`}
+    />
   )
 }
 
@@ -47,6 +60,7 @@ export function App() {
       case 'backlog': return <BacklogPanel />
       case 'teams':   return <TeamsPanel />
       case 'handoff': return <HandoffFeedPanel />
+      case 'cogmesh': return <CognitiveMeshPanel />
       default:        return <AgentFleetPanel />
     }
   }
@@ -70,6 +84,7 @@ export function App() {
         </nav>
         <div className="header-status">
           <SyncIndicator />
+          <CogmeshDot />
           <span
             className={`connection-dot${bridge.connected ? ' connection-dot--online' : ''}`}
             title={bridge.connected ? 'Connected' : 'Disconnected'}

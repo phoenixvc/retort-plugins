@@ -7,6 +7,7 @@ export type HostMessage =
   | { type: 'backlog:updated'; items: BacklogItem[] }
   | { type: 'teams:updated'; teams: Team[] }
   | { type: 'sync:status'; state: 'idle' | 'running' | 'error' | 'success'; message?: string }
+  | { type: 'cogmesh:health:updated'; health: CognitiveMeshHealth }
 
 export type ClientMessage =
   | { type: 'ready' }
@@ -43,7 +44,21 @@ export interface AgentTask {
   maxTurns?: number
   createdAt: string
   updatedAt: string
+  // Cognitive-mesh escalation — present when `retort run cogmesh` dispatched this task
+  escalatedTo?: string
+  workflowId?: string
+  workflowName?: string
+  workflowStage?: number
+  workflowTotalStages?: number
+  fallbackCli?: string
+  resultPath?: string
 }
+
+export type CognitiveMeshHealth =
+  | { status: 'connected'; latencyMs: number }
+  | { status: 'degraded'; latencyMs: number }
+  | { status: 'unreachable' }
+  | { status: 'unconfigured' }
 
 export interface SessionState {
   orchestratorId?: string

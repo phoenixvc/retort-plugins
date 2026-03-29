@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import type { AgentTask, BacklogItem, HostMessage, SessionState, Team } from './types'
+import type { AgentTask, BacklogItem, CognitiveMeshHealth, HostMessage, SessionState, Team } from './types'
 
-export type ActivePanel = 'fleet' | 'backlog' | 'teams' | 'handoff' | 'onboard'
+export type ActivePanel = 'fleet' | 'backlog' | 'teams' | 'handoff' | 'cogmesh' | 'onboard'
 
 interface SyncStatus {
   state: 'idle' | 'running' | 'error' | 'success'
@@ -14,6 +14,7 @@ interface RetortStore {
   tasks: AgentTask[]
   session: SessionState | null
   syncStatus: SyncStatus
+  cogmeshHealth: CognitiveMeshHealth | null
   activePanel: ActivePanel
 
   setActivePanel: (panel: ActivePanel) => void
@@ -28,6 +29,7 @@ export const useStore = create<RetortStore>((set) => ({
   tasks: [],
   session: null,
   syncStatus: { state: 'idle' },
+  cogmeshHealth: null,
   activePanel: 'fleet',
 
   setActivePanel: (panel) => set({ activePanel: panel }),
@@ -64,6 +66,10 @@ export const useStore = create<RetortStore>((set) => ({
 
       case 'sync:status':
         set({ syncStatus: { state: msg.state, message: msg.message } })
+        break
+
+      case 'cogmesh:health:updated':
+        set({ cogmeshHealth: msg.health })
         break
     }
   },
