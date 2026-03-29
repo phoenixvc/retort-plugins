@@ -8,11 +8,15 @@
   },
   "license": "MIT",
   "workspaces": [
-    "extensions/vscode",
-    "extensions/pycharm"
+    "packages/ui",
+    "packages/state-watcher",
+    "extensions/vscode"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @retort-plugins/ui && npm run build -w @retort-plugins/state-watcher && npm run build -w @retort-plugins/vscode",
+    "build:ui": "npm run build -w @retort-plugins/ui",
+    "build:watcher": "npm run build -w @retort-plugins/state-watcher",
+    "build:vscode": "npm run build -w @retort-plugins/vscode",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   }

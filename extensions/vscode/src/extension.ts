@@ -1,40 +1,30 @@
 import * as vscode from 'vscode';
 import { registerCommands } from './commands/registry';
-import { BacklogProvider } from './providers/backlogProvider';
-import { StatusProvider } from './providers/statusProvider';
-import { TeamsProvider } from './providers/teamsProvider';
-import { createStatusBar } from './statusBar';
-import { WatcherService } from './services/watcherService';
+import { TerminalService } from './services/terminalService';
+import { StatusBar } from './statusBar';
+import { RetortWebviewProvider } from './providers/webviewProvider';
+import { StateWatcherProcess } from './services/stateWatcherProcess';
 
 export function activate(context: vscode.ExtensionContext): void {
-  const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!root) return;
+  const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  if (!workspaceRoot) return;
 
-  // Tree data providers
-  const teamsProvider = new TeamsProvider(root);
-  const backlogProvider = new BacklogProvider(root);
-  const statusProvider = new StatusProvider(root);
+  const terminal = new TerminalService(workspaceRoot);
+  const statusBar = new StatusBar(context, workspaceRoot);
+  const stateWatcher = new StateWatcherProcess(context, workspaceRoot);
+  const webviewProvider = new RetortWebviewProvider(context, stateWatcher, terminal);
 
-  vscode.window.registerTreeDataProvider('retort.teams', teamsProvider);
-  vscode.window.registerTreeDataProvider('retort.backlog', backlogProvider);
-  vscode.window.registerTreeDataProvider('retort.status', statusProvider);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider('retort.dashboard', webviewProvider),
+    stateWatcher,
+    statusBar,
+  );
 
-  // Status bar
-  const statusBar = createStatusBar(root, context);
+  registerCommands(context, terminal);
 
-  // File watchers — refresh sidebar on spec/state/backlog changes
-  const watcher = new WatcherService(root, () => {
-    teamsProvider.refresh();
-    backlogProvider.refresh();
-    statusProvider.refresh();
-    statusBar.refresh();
-  });
-  context.subscriptions.push(watcher);
-
-  // Commands
-  registerCommands(context, root, { teamsProvider, backlogProvider, statusProvider });
+  stateWatcher.start();
 }
 
 export function deactivate(): void {
-  // nothing to clean up
+  // nothing to clean up — subscriptions are disposed automatically
 }

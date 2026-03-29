@@ -1,4 +1,4 @@
-name: CI
+name: VSCode Extension
 
 on:
   push:
@@ -18,6 +18,18 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run build
+
+      - name: Build UI
+        run: npm run build -w @retort-plugins/ui
+
+      - name: Build state-watcher
+        run: npm run build -w @retort-plugins/state-watcher
+
+      - name: Build VSCode extension
+        run: npm run build -w @retort-plugins/vscode
+
+      - name: Typecheck all
+        run: npm run typecheck --workspaces --if-present
+
+      - name: Lint all
+        run: npm run lint --workspaces --if-present

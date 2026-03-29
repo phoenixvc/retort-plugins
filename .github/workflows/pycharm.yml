@@ -1,0 +1,26 @@
+name: PyCharm Plugin
+
+on:
+  push:
+    paths: ['extensions/pycharm/**']
+  pull_request:
+    paths: ['extensions/pycharm/**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build plugin
+        working-directory: extensions/pycharm
+        run: ./gradlew buildPlugin
+
+      - name: Verify plugin
+        working-directory: extensions/pycharm
+        run: ./gradlew verifyPlugin

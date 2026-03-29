@@ -1,14 +1,5 @@
 import * as vscode from 'vscode';
 import { TerminalService } from '../services/terminalService';
-import type { BacklogProvider } from '../providers/backlogProvider';
-import type { StatusProvider } from '../providers/statusProvider';
-import type { TeamsProvider } from '../providers/teamsProvider';
-
-interface Providers {
-  teamsProvider: TeamsProvider;
-  backlogProvider: BacklogProvider;
-  statusProvider: StatusProvider;
-}
 
 const QUICK_PICK_COMMANDS = [
   { label: '$(sync) sync', description: 'Regenerate all AI tool configs from spec' },
@@ -27,12 +18,9 @@ const QUICK_PICK_COMMANDS = [
 
 export function registerCommands(
   context: vscode.ExtensionContext,
-  root: string,
-  providers: Providers
+  terminal: TerminalService,
 ): void {
-  const terminal = new TerminalService(root);
-
-  const run = (cmd: string) => terminal.run(cmd);
+  const run = (cmd: string, args?: string[]) => terminal.run(cmd, args);
 
   context.subscriptions.push(
     vscode.commands.registerCommand('retort.sync', () => run('sync')),
@@ -47,11 +35,6 @@ export function registerCommands(
     vscode.commands.registerCommand('retort.preflight', () => run('preflight')),
     vscode.commands.registerCommand('retort.security', () => run('security')),
     vscode.commands.registerCommand('retort.projectStatus', () => run('project-status')),
-    vscode.commands.registerCommand('retort.refreshSidebar', () => {
-      providers.teamsProvider.refresh();
-      providers.backlogProvider.refresh();
-      providers.statusProvider.refresh();
-    }),
     vscode.commands.registerCommand('retort.runCommand', async () => {
       const picked = await vscode.window.showQuickPick(QUICK_PICK_COMMANDS, {
         placeHolder: 'Select a Retort command to run',
@@ -62,6 +45,6 @@ export function registerCommands(
         const cmd = picked.label.replace(/^\$\([^)]+\)\s*/, '');
         run(cmd);
       }
-    })
+    }),
   );
 }

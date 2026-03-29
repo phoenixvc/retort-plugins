@@ -1,3 +1,7 @@
+<!-- NOTE: This file is a reference copy only.
+     The authoritative plugin descriptor consumed by Gradle is at:
+       src/main/resources/META-INF/plugin.xml
+-->
 <idea-plugin>
   <id>com.phoenixvc.retort</id>
   <name>Retort</name>
@@ -8,8 +12,4 @@
     and status bar for the Retort framework.
   </description>
   <idea-version since-build="233"/>
-
-  <!-- Stub — implementation pending -->
-  <extensions defaultExtensionNs="com.intellij">
-  </extensions>
 </idea-plugin>

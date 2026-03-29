@@ -2,31 +2,38 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-interface StatusBarHandle {
-  refresh(): void;
-}
+export class StatusBar implements vscode.Disposable {
+  private readonly syncItem: vscode.StatusBarItem;
+  private readonly phaseItem: vscode.StatusBarItem;
 
-export function createStatusBar(
-  root: string,
-  context: vscode.ExtensionContext
-): StatusBarHandle {
-  const syncItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-  syncItem.command = 'retort.sync';
-  syncItem.tooltip = 'Click to run Retort sync';
+  constructor(
+    private readonly context: vscode.ExtensionContext,
+    private readonly root: string,
+  ) {
+    this.syncItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    this.syncItem.command = 'retort.sync';
+    this.syncItem.tooltip = 'Click to run Retort sync';
 
-  const phaseItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
-  phaseItem.command = 'retort.projectStatus';
-  phaseItem.tooltip = 'Click to run Retort project-status';
+    this.phaseItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
+    this.phaseItem.command = 'retort.projectStatus';
+    this.phaseItem.tooltip = 'Click to run Retort project-status';
 
-  context.subscriptions.push(syncItem, phaseItem);
+    context.subscriptions.push(this.syncItem, this.phaseItem);
 
-  function refresh(): void {
-    updateSyncStatus(root, syncItem);
-    updatePhase(root, phaseItem);
+    this.refresh();
   }
 
-  refresh();
-  return { refresh };
+  refresh(): void {
+    updateSyncStatus(this.root, this.syncItem);
+    updatePhase(this.root, this.phaseItem);
+  }
+
+  dispose(): void {
+    // Status bar items are already pushed to context.subscriptions and will
+    // be disposed by VSCode when the extension deactivates. This method
+    // exists to satisfy vscode.Disposable so StatusBar can be pushed to
+    // context.subscriptions directly.
+  }
 }
 
 function updateSyncStatus(root: string, item: vscode.StatusBarItem): void {

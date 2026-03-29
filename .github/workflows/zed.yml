@@ -1,0 +1,26 @@
+name: Zed Extension
+
+on:
+  push:
+    paths: ['extensions/zed/**']
+  pull_request:
+    paths: ['extensions/zed/**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - uses: actions-rust-lang/setup-rust-toolchain@1fbea72663f6d4c03efaab13560c8a24cfd2a7cc
+        with:
+          toolchain: stable
+          target: wasm32-wasip1
+
+      - name: Build
+        working-directory: extensions/zed
+        run: cargo build --target wasm32-wasip1 --release
+
+      - name: Clippy
+        working-directory: extensions/zed
+        run: cargo clippy --target wasm32-wasip1 -- -D warnings

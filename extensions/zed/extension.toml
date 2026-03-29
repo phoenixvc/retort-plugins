@@ -1,0 +1,30 @@
+id = "retort"
+name = "Retort"
+description = "AI agent orchestration slash commands for the Retort framework"
+version = "0.1.0"
+schema_version = 1
+authors = ["PhoenixVC <https://github.com/phoenixvc>"]
+repository = "https://github.com/phoenixvc/retort-plugins"
+
+[lib]
+kind = "slash_command"
+
+[[slash_commands]]
+name = "retort-status"
+description = "Show active Retort agents and task status"
+requires_argument = false
+
+[[slash_commands]]
+name = "retort-teams"
+description = "List Retort agent teams"
+requires_argument = false
+
+[[slash_commands]]
+name = "retort-backlog"
+description = "Show open Retort backlog items"
+requires_argument = false
+
+[[slash_commands]]
+name = "retort-sync"
+description = "Instructions to run retort sync"
+requires_argument = false

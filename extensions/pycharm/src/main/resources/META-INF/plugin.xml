@@ -1,0 +1,126 @@
+<idea-plugin>
+  <id>com.phoenixvc.retort</id>
+  <name>Retort</name>
+  <version>0.1.0</version>
+  <vendor url="https://github.com/phoenixvc/retort-plugins">PhoenixVC</vendor>
+  <description><![CDATA[
+    AI agent orchestration for JetBrains IDEs.<br/>
+    Provides a command palette, project tool window, and status bar widget
+    for the <a href="https://github.com/phoenixvc/retort">Retort</a> framework.
+  ]]></description>
+  <change-notes><![CDATA[
+    <b>0.1.0</b> — Initial release.
+  ]]></change-notes>
+
+  <idea-version since-build="233"/>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+
+    <!-- Tool window shown in the side panel -->
+    <toolWindow
+      id="Retort"
+      anchor="right"
+      factoryClass="com.phoenixvc.retort.toolwindow.RetortToolWindowFactory"
+      icon="/icons/retort.svg"
+    />
+
+    <!-- Status bar widget -->
+    <statusBarWidgetFactory
+      id="RetortStatusWidget"
+      implementation="com.phoenixvc.retort.toolwindow.RetortStatusBarWidgetFactory"
+      order="after Position"
+    />
+
+    <!-- Project-level service that owns the terminal / process runner -->
+    <projectService
+      serviceImplementation="com.phoenixvc.retort.services.RetortTerminalService"
+    />
+
+    <!-- Project-level service that watches .agentkit state files -->
+    <projectService
+      serviceImplementation="com.phoenixvc.retort.services.RetortStateWatcher"
+    />
+
+  </extensions>
+
+  <actions>
+    <!-- Top-level Retort menu group -->
+    <group id="RetortMenu" text="Retort" popup="true">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+
+      <action id="retort.sync"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Sync Configs"
+              description="Regenerate all AI tool configs from spec">
+        <add-to-group group-id="RetortMenu" anchor="first"/>
+      </action>
+
+      <action id="retort.check"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Run Check"
+              description="Run lint + typecheck + tests"/>
+
+      <action id="retort.healthcheck"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Health Check"
+              description="Full repo health check"/>
+
+      <action id="retort.orchestrate"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Orchestrate"
+              description="Master coordinator — assess, plan, delegate"/>
+
+      <action id="retort.plan"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Plan"
+              description="Structured implementation planning"/>
+
+      <action id="retort.discover"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Discover"
+              description="Scan repo structure and tech stacks"/>
+
+      <action id="retort.validate"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Validate"
+              description="Validate spec against schema"/>
+
+      <action id="retort.backlog"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Show Backlog"
+              description="Show consolidated backlog"/>
+
+      <action id="retort.handoff"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Handoff"
+              description="Generate session handoff document"/>
+
+      <action id="retort.preflight"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Preflight"
+              description="Pre-ship delivery checks"/>
+
+      <action id="retort.security"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Security Scan"
+              description="Security audit"/>
+
+      <action id="retort.projectStatus"
+              class="com.phoenixvc.retort.actions.RetortRunAction"
+              text="Project Status"
+              description="Unified PM dashboard"/>
+
+      <separator/>
+
+      <action id="retort.runCommand"
+              class="com.phoenixvc.retort.actions.RetortPickCommandAction"
+              text="Run Command..."
+              description="Choose and run any Retort command">
+        <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl alt R"/>
+      </action>
+    </group>
+  </actions>
+
+</idea-plugin>

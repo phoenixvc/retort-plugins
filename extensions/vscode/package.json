@@ -30,8 +30,7 @@
       { "command": "retort.preflight", "title": "Retort: Preflight" },
       { "command": "retort.security", "title": "Retort: Security Scan" },
       { "command": "retort.projectStatus", "title": "Retort: Project Status" },
-      { "command": "retort.runCommand", "title": "Retort: Run Command..." },
-      { "command": "retort.refreshSidebar", "title": "Retort: Refresh Sidebar" }
+      { "command": "retort.runCommand", "title": "Retort: Run Command..." }
     ],
     "viewsContainers": {
       "activitybar": [
@@ -44,18 +43,7 @@
     },
     "views": {
       "retort-sidebar": [
-        { "id": "retort.teams", "name": "Teams" },
-        { "id": "retort.backlog", "name": "Backlog" },
-        { "id": "retort.status", "name": "Orchestrator" }
-      ]
-    },
-    "menus": {
-      "view/title": [
-        {
-          "command": "retort.refreshSidebar",
-          "when": "view =~ /^retort\\./",
-          "group": "navigation"
-        }
+        { "id": "retort.dashboard", "name": "Retort", "type": "webview" }
       ]
     },
     "configuration": {
