@@ -30,7 +30,16 @@
       { "command": "retort.preflight", "title": "Retort: Preflight" },
       { "command": "retort.security", "title": "Retort: Security Scan" },
       { "command": "retort.projectStatus", "title": "Retort: Project Status" },
-      { "command": "retort.runCommand", "title": "Retort: Run Command..." }
+      { "command": "retort.runCommand", "title": "Retort: Run Command..." },
+      { "command": "retort.copyContext", "title": "Retort: Copy Workspace Context" }
+    ],
+    "keybindings": [
+      {
+        "command": "retort.runCommand",
+        "key": "shift+ctrl+alt+r",
+        "mac": "shift+cmd+alt+r",
+        "when": "workspaceFolderCount > 0"
+      }
     ],
     "viewsContainers": {
       "activitybar": [

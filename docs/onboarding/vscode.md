@@ -54,23 +54,26 @@ Open the Command Palette (`Ctrl+Shift+P`) and type **Retort** to see all command
 | `Retort: Security Scan` | Security audit |
 | `Retort: Project Status` | Unified PM dashboard |
 | `Retort: Run Command...` | Choose and run any Retort command |
+| `Retort: Copy Workspace Context` | Copy active phase, tasks, and teams to clipboard |
 
 ## Keyboard Shortcut
 
-`Shift+Ctrl+Alt+R` — opens the **Run Command...** picker.
+`Shift+Ctrl+Alt+R` (Windows/Linux) / `Shift+Cmd+Alt+R` (macOS) — opens the **Run Command...** picker.
 
 ## Sidebar
 
 The Retort sidebar view (Activity Bar icon) shows:
 
-- Active orchestration phase
 - In-progress tasks from `.claude/state/tasks/`
+- Agent team roster
 - Quick-launch buttons for common commands
 
 ## Status Bar
 
-A status bar item on the right shows the active phase (e.g. `Retort: Implementation`).
-Click it to open the command picker.
+Two items appear on the left of the status bar:
+
+- `$(sync) Retort` — click to run Sync
+- `$(milestone) Phase N` — shows the active orchestration phase; click to run Project Status
 
 ## Troubleshooting
 

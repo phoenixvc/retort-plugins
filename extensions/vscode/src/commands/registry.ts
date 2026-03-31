@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { TerminalService } from '../services/terminalService';
 
@@ -15,6 +17,68 @@ const QUICK_PICK_COMMANDS = [
   { label: '$(lock) security', description: 'Security audit' },
   { label: '$(dashboard) project-status', description: 'Unified PM dashboard' },
 ];
+
+const PHASE_NAMES: Record<number, string> = {
+  1: 'Discovery',
+  2: 'Planning',
+  3: 'Implementation',
+  4: 'Validation',
+  5: 'Ship',
+};
+
+function buildWorkspaceContext(root: string): string {
+  const sections: string[] = [];
+
+  // Phase
+  try {
+    const statePath = path.join(root, '.claude', 'state', 'orchestrator.json');
+    if (fs.existsSync(statePath)) {
+      const state = JSON.parse(fs.readFileSync(statePath, 'utf-8')) as { phase?: number };
+      if (state.phase !== undefined) {
+        sections.push(`**Active phase:** ${PHASE_NAMES[state.phase] ?? `Phase ${state.phase}`}`);
+      }
+    }
+  } catch { /* ignore */ }
+
+  // In-progress tasks
+  try {
+    const tasksDir = path.join(root, '.claude', 'state', 'tasks');
+    if (fs.existsSync(tasksDir)) {
+      const inProgress = fs.readdirSync(tasksDir)
+        .filter((f) => f.endsWith('.json'))
+        .flatMap((f) => {
+          try {
+            const task = JSON.parse(fs.readFileSync(path.join(tasksDir, f), 'utf-8')) as {
+              status?: string;
+              title?: string;
+            };
+            return task.status === 'working' || task.status === 'accepted'
+              ? [task.title ?? f]
+              : [];
+          } catch { return []; }
+        });
+      if (inProgress.length > 0) {
+        sections.push(`**In-progress tasks:**\n${inProgress.map((t) => `- ${t}`).join('\n')}`);
+      }
+    }
+  } catch { /* ignore */ }
+
+  // Teams file
+  const teamsPaths = [
+    path.join(root, '.agentkit', 'spec', 'teams.yaml'),
+    path.join(root, '.agentkit', 'spec', 'AGENT_TEAMS.yaml'),
+    path.join(root, 'AGENT_TEAMS.md'),
+  ];
+  const teamsFile = teamsPaths.find((p) => fs.existsSync(p));
+  if (teamsFile) {
+    sections.push(
+      `**Retort teams file:** \`${path.basename(teamsFile)}\` (use \`/team-<id>\` commands to delegate work)`,
+    );
+  }
+
+  if (sections.length === 0) return '';
+  return `<!-- Retort Workspace Context -->\n${sections.join('\n\n')}`;
+}
 
 export function registerCommands(
   context: vscode.ExtensionContext,
@@ -35,6 +99,17 @@ export function registerCommands(
     vscode.commands.registerCommand('retort.preflight', () => run('preflight')),
     vscode.commands.registerCommand('retort.security', () => run('security')),
     vscode.commands.registerCommand('retort.projectStatus', () => run('project-status')),
+    vscode.commands.registerCommand('retort.copyContext', async () => {
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      if (!root) return;
+      const ctx = buildWorkspaceContext(root);
+      if (ctx) {
+        await vscode.env.clipboard.writeText(ctx);
+        vscode.window.setStatusBarMessage('$(check) Retort context copied', 2000);
+      } else {
+        vscode.window.showInformationMessage('Retort: no workspace state found — run Sync first.');
+      }
+    }),
     vscode.commands.registerCommand('retort.runCommand', async () => {
       const picked = await vscode.window.showQuickPick(QUICK_PICK_COMMANDS, {
         placeHolder: 'Select a Retort command to run',
