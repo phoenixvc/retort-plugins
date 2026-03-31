@@ -1,4 +1,4 @@
-import { search } from './search.js'
+import { search, semanticSearch } from './search.js'
 import type { AskResponse, RouterIndex, RouteResult } from './types.js'
 
 /**
@@ -34,6 +34,39 @@ export function route(query: string, index: RouterIndex): AskResponse {
   }
 
   const results: RouteResult[] = search(query, index.entries)
+
+  return {
+    results,
+    query,
+    indexedAt: index.indexedAt,
+  }
+}
+
+/**
+ * Routes a natural-language query using semantic (embedding-based) similarity.
+ *
+ * Off-topic queries still return `scopeViolation: true` without running the
+ * (potentially expensive) embedding step.
+ *
+ * @param query   - Natural-language query.
+ * @param index   - RouterIndex with `embedding` fields populated.
+ * @param embedFn - Function that embeds an array of texts into vectors.
+ */
+export async function routeSemantic(
+  query: string,
+  index: RouterIndex,
+  embedFn: (texts: string[]) => Promise<number[][]>,
+): Promise<AskResponse> {
+  if (isOffTopic(query)) {
+    return {
+      results: [],
+      query,
+      indexedAt: index.indexedAt,
+      scopeViolation: true,
+    }
+  }
+
+  const results = await semanticSearch(query, index.entries, embedFn)
 
   return {
     results,

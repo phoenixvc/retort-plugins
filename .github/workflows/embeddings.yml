@@ -1,0 +1,50 @@
+name: Regenerate Embeddings
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'   # weekly Sunday 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build -w @retort-plugins/router
+
+      - name: Regenerate embeddings index
+        run: node packages/router/scripts/generate-embeddings.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/router/data/embeddings.json
+          if git diff --staged --quiet; then
+            echo "No changes to embeddings index."
+            exit 0
+          fi
+          git commit -m "chore(router): regenerate embeddings index [skip ci]"
+          # Try direct push first; if branch protection blocks it, open a PR instead.
+          if ! git push; then
+            echo "Direct push rejected (branch protection active) — opening a PR."
+            BRANCH="chore/embeddings-$(date +%Y%m%d)"
+            git checkout -b "$BRANCH"
+            git push origin "$BRANCH"
+            gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "chore(router): regenerate embeddings index" \
+              --body "Automated weekly embeddings regeneration."
+          fi

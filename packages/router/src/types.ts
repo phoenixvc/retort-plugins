@@ -17,6 +17,8 @@ export interface RouterEntry {
   keywords: string[]
   explanation: string
   suggestedCommand?: string
+  /** Normalised embedding vector (Phase 2 — optional) */
+  embedding?: number[]
 }
 
 export interface RouterIndex {
