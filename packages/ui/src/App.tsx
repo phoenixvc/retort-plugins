@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useBridge } from './bridge/useBridge'
 import { useStore } from './bridge/useStore'
 import type { ActivePanel } from './bridge/useStore'
@@ -7,6 +8,7 @@ import { TeamsPanel } from './panels/TeamsPanel'
 import { HandoffFeedPanel } from './panels/HandoffFeedPanel'
 import { CognitiveMeshPanel } from './panels/CognitiveMeshPanel'
 import { OnboardingPanel } from './panels/OnboardingPanel'
+import { AskPanel } from './panels/AskPanel'
 
 interface Tab {
   id: ActivePanel
@@ -19,7 +21,16 @@ const TABS: Tab[] = [
   { id: 'teams', label: 'Teams' },
   { id: 'handoff', label: 'Handoff' },
   { id: 'cogmesh', label: 'Mesh' },
+  { id: 'ask', label: 'Ask' },
 ]
+
+// HTTP and WebSocket share the same port, so derive baseUrl from window.location.
+function resolveBaseUrl(): string {
+  const params = new URLSearchParams(window.location.search)
+  const port = params.get('port') ?? window.location.port
+  const host = window.location.hostname || 'localhost'
+  return `http://${host}:${port}`
+}
 
 function SyncIndicator() {
   const { state, message } = useStore((s) => s.syncStatus)
@@ -53,6 +64,20 @@ export function App() {
   // state-watcher hasn't found a .retortconfig in the workspace.
   const showOnboarding = session === null && teams.length === 0
 
+  // Keyboard shortcut: Ctrl+Shift+? (or Cmd+Shift+?) opens Ask panel
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === '?') {
+        e.preventDefault()
+        setActivePanel('ask')
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [setActivePanel])
+
+  const baseUrl = resolveBaseUrl()
+
   function renderPanel() {
     if (showOnboarding) return <OnboardingPanel send={bridge.send} />
     switch (activePanel) {
@@ -61,6 +86,7 @@ export function App() {
       case 'teams':   return <TeamsPanel />
       case 'handoff': return <HandoffFeedPanel />
       case 'cogmesh': return <CognitiveMeshPanel />
+      case 'ask':     return <AskPanel baseUrl={baseUrl} />
       default:        return <AgentFleetPanel />
     }
   }

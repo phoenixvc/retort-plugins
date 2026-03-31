@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { AgentTask, BacklogItem, CognitiveMeshHealth, HostMessage, SessionState, Team } from './types'
 
-export type ActivePanel = 'fleet' | 'backlog' | 'teams' | 'handoff' | 'cogmesh' | 'onboard'
+export type ActivePanel = 'fleet' | 'backlog' | 'teams' | 'handoff' | 'cogmesh' | 'ask' | 'onboard'
 
 interface SyncStatus {
   state: 'idle' | 'running' | 'error' | 'success'

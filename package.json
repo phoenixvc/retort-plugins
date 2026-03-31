@@ -8,12 +8,14 @@
   },
   "license": "MIT",
   "workspaces": [
+    "packages/router",
     "packages/ui",
     "packages/state-watcher",
     "extensions/vscode"
   ],
   "scripts": {
-    "build": "npm run build -w @retort-plugins/ui && npm run build -w @retort-plugins/state-watcher && npm run build -w @retort-plugins/vscode",
+    "build": "npm run build -w @retort-plugins/router && npm run build -w @retort-plugins/ui && npm run build -w @retort-plugins/state-watcher && npm run build -w @retort-plugins/vscode",
+    "build:router": "npm run build -w @retort-plugins/router",
     "build:ui": "npm run build -w @retort-plugins/ui",
     "build:watcher": "npm run build -w @retort-plugins/state-watcher",
     "build:vscode": "npm run build -w @retort-plugins/vscode",

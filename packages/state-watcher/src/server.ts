@@ -1,16 +1,23 @@
+import * as http from 'http'
 import { WebSocketServer, WebSocket } from 'ws'
 import type { HostMessage, ClientMessage } from './protocol.js'
+import type { AskResponse, RouterIndex } from '@retort-plugins/router'
+import { route } from '@retort-plugins/router'
 
 export type CommandHandler = (command: string, args?: string[]) => void
 
 /**
- * Creates a WebSocket server on a random available port.
+ * Creates an HTTP + WebSocket server on a random available port.
  *
- * - Calls `onReady(port)` once the server is listening.
- * - Calls `onCommand` when a connected client sends a `command:run` message.
- *   The host (VS Code extension) reads these from stdout as `CMD:<json>`.
+ * HTTP routes:
+ *   GET /api/ask?q=<query>  — semantic team routing
+ *   GET /health             — liveness probe
  *
- * Returns a `broadcast` function and a `close` function.
+ * WebSocket (ws://localhost:<port>/ws):
+ *   Calls `onReady(port)` once listening.
+ *   Calls `onCommand` when a client sends a `command:run` message.
+ *
+ * Returns `broadcast`, `close`, and `setRouterIndex` functions.
  */
 export function createServer(
   onReady: (port: number) => void,
@@ -18,14 +25,58 @@ export function createServer(
 ): {
   broadcast: (msg: HostMessage) => void
   close: () => void
+  setRouterIndex: (index: RouterIndex) => void
 } {
-  const wss = new WebSocketServer({ port: 0 })
+  let routerIndex: RouterIndex | null = null
 
-  wss.on('listening', () => {
-    const addr = wss.address()
-    const port = typeof addr === 'object' && addr ? addr.port : 0
-    onReady(port)
+  // ---------------------------------------------------------------------------
+  // HTTP server — handles /health and /api/ask; upgrades WS connections
+  // ---------------------------------------------------------------------------
+
+  const httpServer = http.createServer((req, res) => {
+    const url = new URL(req.url ?? '/', `http://localhost`)
+
+    // CORS headers so the UI WebView can fetch from the same origin
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Content-Type', 'application/json')
+
+    if (url.pathname === '/health') {
+      res.writeHead(200)
+      res.end(JSON.stringify({ status: 'ok' }))
+      return
+    }
+
+    if (url.pathname === '/api/ask') {
+      const q = url.searchParams.get('q') ?? ''
+      if (!q.trim()) {
+        res.writeHead(400)
+        res.end(JSON.stringify({ error: 'q parameter is required' }))
+        return
+      }
+
+      if (!routerIndex) {
+        // Index not yet built — return empty results rather than 503
+        const empty: AskResponse = { results: [], query: q, indexedAt: '' }
+        res.writeHead(200)
+        res.end(JSON.stringify(empty))
+        return
+      }
+
+      const response = route(q, routerIndex)
+      res.writeHead(200)
+      res.end(JSON.stringify(response))
+      return
+    }
+
+    res.writeHead(404)
+    res.end(JSON.stringify({ error: 'not found' }))
   })
+
+  // ---------------------------------------------------------------------------
+  // WebSocket server — attached to the same HTTP server
+  // ---------------------------------------------------------------------------
+
+  const wss = new WebSocketServer({ server: httpServer })
 
   wss.on('connection', (ws: WebSocket) => {
     ws.on('message', (data) => {
@@ -39,9 +90,14 @@ export function createServer(
       if (msg.type === 'command:run') {
         onCommand(msg.command, msg.args)
       }
-      // 'ready' and 'file:open' are handled by the UI / extension layer;
-      // we only need to relay command:run via stdout.
     })
+  })
+
+  // port: 0 asks the OS to pick a free port
+  httpServer.listen(0, '127.0.0.1', () => {
+    const addr = httpServer.address()
+    const port = typeof addr === 'object' && addr ? addr.port : 0
+    onReady(port)
   })
 
   const broadcast = (msg: HostMessage): void => {
@@ -55,7 +111,12 @@ export function createServer(
 
   const close = (): void => {
     wss.close()
+    httpServer.close()
   }
 
-  return { broadcast, close }
+  const setRouterIndex = (index: RouterIndex): void => {
+    routerIndex = index
+  }
+
+  return { broadcast, close, setRouterIndex }
 }

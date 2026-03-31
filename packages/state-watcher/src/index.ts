@@ -17,6 +17,7 @@ import { createWatcher, type ChangeKind } from './watcher.js'
 import { createServer } from './server.js'
 import { createCogmeshPoller } from './cogmesh-poller.js'
 import type { HostMessage } from './protocol.js'
+import { buildIndex } from '@retort-plugins/router'
 
 const workspaceRoot = process.argv[2]
 
@@ -43,10 +44,12 @@ function buildSnapshot(): HostMessage & { type: 'snapshot' } {
 // Start WebSocket server
 // ---------------------------------------------------------------------------
 
-const { broadcast, close } = createServer(
+const { broadcast, close, setRouterIndex } = createServer(
   (port) => {
     // Signal VS Code extension that the server is ready
     process.stdout.write(`PORT:${port}\n`)
+    // Build initial router index once teams are parsed
+    setRouterIndex(buildIndex(parseTeams(workspaceRoot)))
   },
   (command, args) => {
     // Relay command:run from UI to the extension via stdout
@@ -101,9 +104,12 @@ function flushPending(): void {
       }
       break
     }
-    case 'teams':
-      broadcast({ type: 'teams:updated', teams: parseTeams(workspaceRoot) })
+    case 'teams': {
+      const teams = parseTeams(workspaceRoot)
+      broadcast({ type: 'teams:updated', teams })
+      setRouterIndex(buildIndex(teams))
       break
+    }
     default:
       broadcast(buildSnapshot())
   }
