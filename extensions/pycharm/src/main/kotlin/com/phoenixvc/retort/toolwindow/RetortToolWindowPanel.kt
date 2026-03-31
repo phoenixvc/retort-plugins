@@ -5,11 +5,14 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.ui.JBUI
+import com.phoenixvc.retort.junie.RetortWorkspaceContextService
 import com.phoenixvc.retort.services.RetortStateWatcher
 import com.phoenixvc.retort.services.RetortTerminalService
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import java.awt.GridLayout
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import javax.swing.*
 
 /**
@@ -33,6 +36,10 @@ class RetortToolWindowPanel(private val project: Project) : JBPanel<RetortToolWi
         border = JBUI.Borders.emptyLeft(4)
     }
 
+    // Null when Junie is not installed (service not registered via junie.xml)
+    private val junieContextService: RetortWorkspaceContextService? =
+        project.getService(RetortWorkspaceContextService::class.java)
+
     init {
         border = JBUI.Borders.empty(8)
         buildUi()
@@ -45,10 +52,11 @@ class RetortToolWindowPanel(private val project: Project) : JBPanel<RetortToolWi
     // -------------------------------------------------------------------------
 
     private fun buildUi() {
-        // Header: phase + backlog notice
+        // Header: phase + backlog notice + Junie copy button
         val header = JBPanel<JBPanel<*>>(BorderLayout()).apply {
             add(phaseLabel, BorderLayout.NORTH)
             add(backlogNotice, BorderLayout.CENTER)
+            add(copyContextButton(), BorderLayout.SOUTH)
         }
         add(header, BorderLayout.NORTH)
 
@@ -60,6 +68,34 @@ class RetortToolWindowPanel(private val project: Project) : JBPanel<RetortToolWi
             }
         }
         add(JBScrollPane(buttonPanel), BorderLayout.CENTER)
+    }
+
+    private fun copyContextButton(): JButton = JButton("Copy Workspace Context").apply {
+        border = JBUI.Borders.emptyTop(4)
+        if (junieContextService == null) {
+            isEnabled = false
+            toolTipText = "Install Junie to enable context injection"
+        } else {
+            toolTipText = "Copy Retort context to clipboard for use in a Junie session"
+            addActionListener {
+                val context = junieContextService.buildContext()
+                if (context.isNotEmpty()) {
+                    Toolkit.getDefaultToolkit().systemClipboard
+                        .setContents(StringSelection(context), null)
+                    text = "Copied!"
+                    Timer(1500) { text = "Copy Workspace Context" }.also {
+                        it.isRepeats = false
+                        it.start()
+                    }
+                } else {
+                    text = "Nothing to copy"
+                    Timer(1500) { text = "Copy Workspace Context" }.also {
+                        it.isRepeats = false
+                        it.start()
+                    }
+                }
+            }
+        }
     }
 
     private fun commandButton(label: String, command: String): JButton =
