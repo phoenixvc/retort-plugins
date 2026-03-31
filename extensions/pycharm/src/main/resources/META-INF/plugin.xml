@@ -4,17 +4,21 @@
   <version>0.1.0</version>
   <vendor url="https://github.com/phoenixvc/retort-plugins">PhoenixVC</vendor>
   <description><![CDATA[
-    AI agent orchestration for JetBrains IDEs.<br/>
+    AI agent orchestration for JetBrains IDEs — PyCharm, IntelliJ IDEA, Rider, and more.<br/>
     Provides a command palette, project tool window, and status bar widget
-    for the <a href="https://github.com/phoenixvc/retort">Retort</a> framework.
+    for the <a href="https://github.com/phoenixvc/retort">Retort</a> framework.<br/><br/>
+    When <b>Junie</b> is installed, Retort injects active team and task context into AI sessions.
   ]]></description>
   <change-notes><![CDATA[
     <b>0.1.0</b> — Initial release.
   ]]></change-notes>
 
-  <idea-version since-build="233"/>
+  <idea-version since-build="233" until-build="251.*"/>
 
   <depends>com.intellij.modules.platform</depends>
+
+  <!-- Optional Junie integration — loaded only when Junie is installed -->
+  <depends optional="true" config-file="junie.xml">com.intellij.junie</depends>
 
   <extensions defaultExtensionNs="com.intellij">
 
