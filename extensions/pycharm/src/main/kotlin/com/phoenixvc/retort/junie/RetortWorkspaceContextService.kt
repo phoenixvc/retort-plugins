@@ -3,6 +3,7 @@ package com.phoenixvc.retort.junie
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import java.io.File
+import java.nio.charset.StandardCharsets
 
 /**
  * Reads Retort workspace state and formats it as a Junie context block.
@@ -34,7 +35,7 @@ class RetortWorkspaceContextService(private val project: Project) {
         val sessionFile = File(root, ".claude/state/orchestrator.json")
         if (sessionFile.exists()) {
             try {
-                val text = sessionFile.readText()
+                val text = sessionFile.readText(StandardCharsets.UTF_8)
                 val phaseMatch = Regex(""""phase"\s*:\s*(\d+)""").find(text)
                 val phase = phaseMatch?.groupValues?.get(1)?.toIntOrNull()
                 if (phase != null) {
@@ -50,8 +51,10 @@ class RetortWorkspaceContextService(private val project: Project) {
             val inProgress = tasksDir.listFiles { f -> f.extension == "json" }
                 ?.mapNotNull { f ->
                     try {
-                        val text = f.readText()
-                        if (text.contains(""""status":"working"""") || text.contains(""""status":"accepted"""")) {
+                        val text = f.readText(StandardCharsets.UTF_8)
+                        val status = Regex(""""status"\s*:\s*"([^"]+)"""").find(text)
+                            ?.groupValues?.get(1)
+                        if (status == "working" || status == "accepted") {
                             Regex(""""title"\s*:\s*"([^"]+)"""").find(text)?.groupValues?.get(1)
                         } else null
                     } catch (_: Exception) { null }
