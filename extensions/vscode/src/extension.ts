@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { registerCommands } from './commands/registry';
+import { registerChatParticipant } from './chat/retortChatParticipant';
 import { TerminalService } from './services/terminalService';
 import { StatusBar } from './statusBar';
 import { RetortWebviewProvider } from './providers/webviewProvider';
@@ -21,6 +22,7 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   registerCommands(context, terminal);
+  registerChatParticipant(context);
 
   stateWatcher.start();
 }

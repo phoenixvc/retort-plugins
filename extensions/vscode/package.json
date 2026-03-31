@@ -10,7 +10,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.90.0"
   },
   "categories": ["Other"],
   "keywords": ["retort", "agentkit", "ai", "agent", "orchestration"],
@@ -32,6 +32,19 @@
       { "command": "retort.projectStatus", "title": "Retort: Project Status" },
       { "command": "retort.runCommand", "title": "Retort: Run Command..." },
       { "command": "retort.copyContext", "title": "Retort: Copy Workspace Context" }
+    ],
+    "chatParticipants": [
+      {
+        "id": "retort",
+        "name": "retort",
+        "description": "Retort workspace assistant — phase, tasks, teams, and backlog",
+        "isSticky": false,
+        "commands": [
+          { "name": "status", "description": "Show active phase and in-progress tasks" },
+          { "name": "teams",  "description": "Show agent team roster" },
+          { "name": "backlog","description": "Show open backlog items" }
+        ]
+      }
     ],
     "keybindings": [
       {
@@ -82,7 +95,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "@vscode/test-electron": "^2.3.0",

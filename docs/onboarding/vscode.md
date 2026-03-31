@@ -6,8 +6,9 @@ a `.agentkit/` directory is present at the workspace root.
 
 ## Requirements
 
-- VS Code `^1.85.0`
+- VS Code `^1.90.0`
 - Retort installed in the project (`.agentkit/spec/project.yaml` must exist)
+- [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) (optional — required for `@retort` Copilot integration)
 
 ## Installation
 
@@ -74,6 +75,33 @@ Two items appear on the left of the status bar:
 
 - `$(sync) Retort` — click to run Sync
 - `$(milestone) Phase N` — shows the active orchestration phase; click to run Project Status
+
+## Copilot Chat Integration
+
+When GitHub Copilot Chat is installed, Retort registers as a `@retort` chat participant.
+Use it directly in the Copilot Chat panel (`Ctrl+Alt+I`):
+
+| Command | What it returns |
+|---------|----------------|
+| `@retort /status` | Active phase + in-progress tasks |
+| `@retort /teams` | Full contents of your teams file |
+| `@retort /backlog` | Contents of `AGENT_BACKLOG.md` |
+| `@retort <question>` | Injects workspace context, then answers |
+
+**Example:**
+```
+@retort /status
+# → Active phase: Implementation
+#   In-progress tasks:
+#   - feat(auth): add OAuth2 login flow
+#   Retort teams file: `teams.yaml`
+
+@retort which team should handle the payment endpoint?
+# → injects context above, Copilot answers based on your team roster
+```
+
+If Copilot Chat is not installed the `@retort` participant is unavailable, but
+all other extension features (commands, sidebar, status bar) work normally.
 
 ## Troubleshooting
 

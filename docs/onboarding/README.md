@@ -31,7 +31,8 @@ workspace root. No manual configuration is needed for basic usage.
 | Command palette | ✓ | ✓ | ✓ (slash commands) |
 | Project tool window / sidebar | ✓ | ✓ | — |
 | Status bar widget | ✓ | ✓ | — |
-| Junie / AI context injection | — | ✓ (optional) | — |
+| Copy Workspace Context | ✓ | ✓ | — |
+| AI context injection | ✓ `@retort` (Copilot Chat) | ✓ Junie (optional) | — |
 
 ## Quick Links
 
