@@ -15,6 +15,7 @@
 import { parseBacklog, parseTasks, parseTeams, parseSession } from './parsers/index.js'
 import { createWatcher, type ChangeKind } from './watcher.js'
 import { createServer } from './server.js'
+import { createCogmeshPoller } from './cogmesh-poller.js'
 import type { HostMessage } from './protocol.js'
 
 const workspaceRoot = process.argv[2]
@@ -53,6 +54,10 @@ const { broadcast, close } = createServer(
   },
 )
 
+const cogmeshPoller = createCogmeshPoller(workspaceRoot, (health) => {
+  broadcast({ type: 'cogmesh:health:updated', health })
+})
+
 // ---------------------------------------------------------------------------
 // File watcher — debounce and broadcast targeted updates
 // ---------------------------------------------------------------------------
@@ -70,6 +75,11 @@ const stopWatcher = createWatcher(workspaceRoot, (kind) => {
 })
 
 function flushPending(): void {
+  // .retortconfig change — reload CM config before sending snapshot
+  if (pendingKinds.has('generic')) {
+    cogmeshPoller.reload()
+  }
+
   // If multiple kinds changed, send a full snapshot rather than many patches —
   // it keeps the protocol simple and avoids ordering issues.
   if (pendingKinds.size > 1 || pendingKinds.has('generic') || pendingKinds.has('session')) {
@@ -105,6 +115,7 @@ function flushPending(): void {
 
 async function shutdown(): Promise<void> {
   if (debounceTimer) clearTimeout(debounceTimer)
+  cogmeshPoller.stop()
   await stopWatcher()
   close()
 }

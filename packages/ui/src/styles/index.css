@@ -256,6 +256,154 @@ code {
 .handoff-from, .handoff-to { color: var(--fg); }
 .handoff-time { font-size: 11px; color: var(--muted); }
 
+/* ─── System health bar ──────────────────────────────────────────────────── */
+.system-health-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.health-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.health-pill--ok    { border-color: #7c3aed33; color: var(--fg); }
+.health-pill--warn  { border-color: #ff980033; color: var(--warning); }
+.health-pill--error { border-color: #f4433633; color: var(--error); }
+.health-pill--off   { opacity: 0.45; }
+
+.health-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--muted);
+}
+.health-pill--ok    .health-pill-dot { background: #7c3aed; }
+.health-pill--warn  .health-pill-dot { background: var(--warning); }
+.health-pill--error .health-pill-dot { background: var(--error); }
+
+.health-pill-detail {
+  color: var(--muted);
+  font-size: 10px;
+}
+.health-pill--warn  .health-pill-detail { color: var(--warning); }
+.health-pill--error .health-pill-detail { color: var(--error); }
+
+/* ─── Cognitive Mesh panel ───────────────────────────────────────────────── */
+.cogmesh-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--muted);
+}
+.cogmesh-dot--connected  { background: #7c3aed; }
+.cogmesh-dot--degraded   { background: var(--warning); }
+.cogmesh-dot--unreachable { background: var(--error); }
+
+.cm-panel { display: flex; flex-direction: column; gap: 12px; }
+
+.cm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.cm-header-label { font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+
+.cm-health {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+}
+.cm-health--connected   { color: #7c3aed; }
+.cm-health--degraded    { color: var(--warning); }
+.cm-health--unreachable { color: var(--error); }
+.cm-health--unconfigured { color: var(--muted); }
+
+.cm-section { display: flex; flex-direction: column; gap: 6px; }
+.cm-section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+.cm-card-list { display: flex; flex-direction: column; gap: 6px; }
+
+.cm-card {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.cm-card--working   { border-left: 3px solid #7c3aed; }
+.cm-card--completed { border-left: 3px solid var(--success); }
+.cm-card--failed    { border-left: 3px solid var(--error); opacity: 0.8; }
+
+.cm-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cm-card-icon     { font-size: 12px; width: 14px; text-align: center; flex-shrink: 0; }
+.cm-card-workflow { font-size: 11px; font-weight: 600; color: #7c3aed; flex: 1; }
+.cm-card-age      { font-size: 11px; color: var(--muted); }
+
+.cm-card-goal {
+  font-size: 12px;
+  color: var(--fg);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.cm-stage-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cm-stage-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.cm-stage-fill {
+  height: 100%;
+  background: #7c3aed;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.cm-stage-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+.cm-card-fallback { font-size: 11px; color: var(--warning); }
+
+.cm-result-link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0;
+  text-decoration: underline;
+}
+.cm-result-link:hover { opacity: 0.8; }
+
 /* ─── Onboarding panel ───────────────────────────────────────────────────── */
 .onboarding-panel {
   display: flex;
