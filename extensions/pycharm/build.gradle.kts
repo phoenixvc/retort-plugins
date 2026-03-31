@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
     id("org.jetbrains.intellij.platform") version "2.2.1"
     id("org.jetbrains.kotlin.jvm") version "2.0.21"
@@ -15,7 +17,8 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        // Targets PyCharm Community; swap to "PC" for Professional or "IU" for IntelliJ Ultimate
+        // Targets PyCharm Community for development; plugin.xml declares platform-level
+        // compatibility so it also runs on Rider, IntelliJ IDEA, and other JetBrains IDEs.
         pycharmCommunity("2024.3")
         bundledPlugins("com.intellij.modules.python")
         pluginVerifier()
@@ -29,6 +32,14 @@ intellijPlatform {
         name = "Retort"
         ideaVersion {
             sinceBuild = "233"
+        }
+    }
+
+    pluginVerification {
+        ides {
+            // Verify against both PyCharm Community and Rider to ensure cross-IDE compatibility
+            ide(IntelliJPlatformType.PyCharmCommunity, "2024.3")
+            ide(IntelliJPlatformType.Rider, "2024.3")
         }
     }
 

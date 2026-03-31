@@ -1,0 +1,21 @@
+<!--
+  Optional Junie integration descriptor.
+  Loaded only when the Junie plugin (com.intellij.junie) is installed.
+
+  Junie's third-party context provider API is not yet stable/public.
+  The RetortWorkspaceContextService is registered here as a project service
+  so it is available for wiring once the API ships.
+
+  TODO: Register com.intellij.junie.ext.JunieContextProvider extension once
+        JetBrains publishes the stable extension point in their SDK.
+-->
+<idea-plugin>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Project service that builds Retort workspace context for Junie sessions -->
+    <projectService
+      serviceImplementation="com.phoenixvc.retort.junie.RetortWorkspaceContextService"
+    />
+  </extensions>
+
+</idea-plugin>

@@ -1,10 +1,11 @@
-name: PyCharm Plugin
+name: JetBrains Plugin
 
 on:
   push:
     paths: ['extensions/pycharm/**']
   pull_request:
     paths: ['extensions/pycharm/**']
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,6 +22,6 @@ jobs:
         working-directory: extensions/pycharm
         run: ./gradlew buildPlugin
 
-      - name: Verify plugin
+      - name: Verify plugin (PyCharm + Rider)
         working-directory: extensions/pycharm
         run: ./gradlew verifyPlugin
