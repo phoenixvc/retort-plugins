@@ -1,0 +1,5 @@
+export { buildIndex, tokenise } from './index-builder.js'
+export type { TeamLike } from './index-builder.js'
+export { search } from './search.js'
+export { route } from './router.js'
+export type { RouteResult, RouterEntry, RouterIndex, AskResponse } from './types.js'

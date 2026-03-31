@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,6 +19,12 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
+
+      - name: Build router
+        run: npm run build -w @retort-plugins/router
+
+      - name: Test router
+        run: npm run test -w @retort-plugins/router
 
       - name: Build UI
         run: npm run build -w @retort-plugins/ui
