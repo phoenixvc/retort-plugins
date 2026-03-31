@@ -122,10 +122,11 @@ async function main() {
   try {
     const mod = await import('../dist/index.js')
     buildSemanticIndex = mod.buildSemanticIndex
-  } catch {
+  } catch (err) {
     console.error(
       'ERROR: Could not import dist/index.js. Run `npm run build -w @retort-plugins/router` first.',
     )
+    console.error('Underlying error:', err)
     process.exit(1)
   }
 

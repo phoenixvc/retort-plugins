@@ -36,13 +36,21 @@ async function getPipeline(): Promise<FeatureExtractionPipeline> {
  * @param texts - Array of strings to embed (must be non-empty).
  * @returns     - Array of normalised float arrays, one per input text.
  */
+// all-MiniLM-L6-v2 produces 384-dimensional embeddings.
+const EMBEDDING_DIM = 384
+
 export async function embed(texts: string[]): Promise<number[][]> {
+  if (texts.length === 0) return []
+
   const extractor = await getPipeline()
 
+  // Process the whole batch in a single pipeline call instead of N serial calls.
+  // output.data is a flat Float32Array of shape [batch_size × EMBEDDING_DIM].
+  const output = await extractor(texts, { pooling: 'mean', normalize: true })
   const results: number[][] = []
-  for (const text of texts) {
-    const output = await extractor([text], { pooling: 'mean', normalize: true })
-    results.push(Array.from(output.data))
+  for (let i = 0; i < texts.length; i++) {
+    const start = i * EMBEDDING_DIM
+    results.push(Array.from(output.data.slice(start, start + EMBEDDING_DIM)))
   }
   return results
 }
