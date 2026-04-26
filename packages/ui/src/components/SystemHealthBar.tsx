@@ -42,7 +42,7 @@ export function SystemHealthBar() {
 
   const indicators: ServiceIndicator[] = [
     cogmeshIndicator(cogmeshHealth),
-    // Future: phoenix-flow, mcp-org, sluice, etc.
+    // Future: baton, mcp-org, sluice, etc.
   ]
 
   // Don't render the bar if every service is 'off' — no value shown
