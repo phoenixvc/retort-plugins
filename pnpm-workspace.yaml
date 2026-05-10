@@ -1,0 +1,5 @@
+packages:
+  - packages/router
+  - packages/ui
+  - packages/state-watcher
+  - extensions/vscode
